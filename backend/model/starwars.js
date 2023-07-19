@@ -8,7 +8,7 @@ let SWSchema = Schema({
   name: String,
   role: String,
   age: String,
-  forePoints: String,
+  forcePoints: String,
 });
 
 //  3
