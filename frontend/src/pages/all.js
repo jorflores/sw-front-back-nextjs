@@ -2,7 +2,30 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 function all() {
+  function deleteCharacter(id) {
+    axios.delete("http://localhost:5000/api/delete/" + id).then((response) => {
+      console.log(response);
+      getAllCharacters();
+    });
+  }
+
+  function showUpdateCharacter(character) {
+    setCharacterToUpdate(character);
+    setShowUpdateModal(true);
+  }
+
+  function updateCharacter(personaje) {
+    axios
+      .put("http://localhost:5000/api/update", personaje)
+      .then((response) => {
+        console.log(response);
+        getAllCharacters();
+      });
+  }
+
   const [data, setData] = useState([]);
+  const [characterToUpdate, setCharacterToUpdate] = useState(null);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
 
   function getAllCharacters() {
     axios.get("http://localhost:5000/api/characters/").then((response) => {
@@ -47,12 +70,76 @@ function all() {
                     <h3>Role: {info.role}</h3>
                     <h3>Age: {info.age}</h3>
                     <h3>Force Points: {info.forcePoints}</h3>
-                    <button className="btn btn-warning btn-lg">Delete</button>
-                    <button className="btn btn-primary btn-lg">Update </button>
+                    <button
+                      className="btn btn-warning btn-lg"
+                      onClick={() => deleteCharacter(info._id)}
+                    >
+                      Delete
+                    </button>
+                    <button
+                      className="btn btn-primary btn-lg"
+                      onClick={() => showUpdateCharacter(info)}
+                    >
+                      Update{" "}
+                    </button>
                     <hr />
                   </li>
                 );
               })}
+
+              {showUpdateModal && characterToUpdate && (
+                <div className="update-modal">
+                  {/* Create a form or modal to update the character data */}
+                  {/* For simplicity, let's assume we have input fields for name, role, age, and forcePoints */}
+                  <h2>Update Character</h2>
+                  <input
+                    type="text"
+                    value={characterToUpdate.name}
+                    onChange={(e) =>
+                      setCharacterToUpdate({
+                        ...characterToUpdate,
+                        name: e.target.value,
+                      })
+                    }
+                  />
+                  <input
+                    type="text"
+                    value={characterToUpdate.role}
+                    onChange={(e) =>
+                      setCharacterToUpdate({
+                        ...characterToUpdate,
+                        role: e.target.value,
+                      })
+                    }
+                  />
+                  <input
+                    type="number"
+                    value={characterToUpdate.age}
+                    onChange={(e) =>
+                      setCharacterToUpdate({
+                        ...characterToUpdate,
+                        age: e.target.value,
+                      })
+                    }
+                  />
+                  <input
+                    type="number"
+                    value={characterToUpdate.forcePoints}
+                    onChange={(e) =>
+                      setCharacterToUpdate({
+                        ...characterToUpdate,
+                        forcePoints: e.target.value,
+                      })
+                    }
+                  />
+                  <button onClick={() => updateCharacter(characterToUpdate)}>
+                    Save
+                  </button>
+                  <button onClick={() => setShowUpdateModal(false)}>
+                    Cancel
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -52,34 +52,55 @@ app.get("/", function (req, res) {
 });
 
 // Displays all characters
-app.get("/api/characters", function (req, res) {
-  return res.json(characters);
+app.get("/api/characters", async function (req, res) {
+  let datos = await SW.find();
+  return res.json(datos);
+  // return res.json(characters);
 });
 
 // Displays a single character, or shows "No character found"
-app.get("/api/characters/:character", function (req, res) {
+app.get("/api/characters/:character", async function (req, res) {
   const chosen = req.params.character;
 
   console.log(chosen);
 
-  for (let i = 0; i < characters.length; i++) {
+  let datos = await SW.find({ routeName: chosen });
+
+  /*for (let i = 0; i < characters.length; i++) {
     if (chosen === characters[i].routeName) {
       return res.json([characters[i]]);
     }
-  }
+  }*/
 
-  return res.json({});
+  return res.json(datos);
 });
 
 // Create New Characters - takes in JSON input
-app.post("/api/characters", function (req, res) {
+app.post("/api/characters", async function (req, res) {
   const newcharacter = req.body;
 
   console.log(newcharacter);
 
-  characters.push(newcharacter);
+  let personaje = new SW(newcharacter);
+  await personaje.save();
 
-  res.json(newcharacter);
+  //characters.push(newcharacter);
+
+  res.json(personaje);
+});
+
+app.delete("/api/delete/:id", async function (req, res) {
+  let id = req.params.id;
+  let personaje = await SW.findOne({ _id: id });
+  await personaje.deleteOne();
+  res.json({});
+});
+
+app.put("/api/update", async function (req, res) {
+  const personaje = req.body;
+  await SW.updateOne(personaje);
+
+  res.json(personaje);
 });
 
 app.listen(PORT, function () {
